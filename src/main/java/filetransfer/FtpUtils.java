@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.SocketException;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,12 +28,12 @@ public class FtpUtils extends FTPUtils {
 	 * 
 	 * @param context
 	 * @param connectionInfo
-	 * @param ftpFolderPath
-	 *            Remote path to upload file within.
-	 * @param file
-	 *            Local file to transfer the bytes of.
+	 * @param inputStream
+	 *            InputStream to transfer the bytes of.
 	 * @param filename
 	 *            Remote file name to use.
+	 * @param ftpFolderPath
+	 *            Remote path to upload file within.
 	 */
 	public static void uploadInputStream(ISftpConnectionInfo connectionInfo,
 			InputStream inputStream, String filename, String ftpFolderPath)
@@ -110,7 +111,7 @@ public class FtpUtils extends FTPUtils {
 	 * @param context
 	 * @param connectionInfo
 	 * @param sftpFolderPath
-	 * @param prefix
+	 * @param wildcardMatcher
 	 * @param OutputFolder
 	 * @param files
 	 * @throws IOException
@@ -118,7 +119,7 @@ public class FtpUtils extends FTPUtils {
 	 */
 	public static void downloadAndRemoveFiles(
 			ISftpConnectionInfo connectionInfo, String sftpFolderPath,
-			String prefix, String OutputFolder, List<File> files)
+			String wildcardMatcher, String OutputFolder, List<File> files)
 			throws SocketException, IOException {
 
 		FTPConnectionInfo connection = (FTPConnectionInfo) (connectionInfo
@@ -131,19 +132,20 @@ public class FtpUtils extends FTPUtils {
 		ftpClient.changeWorkingDirectory(sftpFolderPath);
 
 		for (FTPFile file : FTPfiles) {
-
 			String filename = file.getName();
-			if (filename.startsWith(prefix)) {
+			
+			if (wildcardMatcher == null || wildcardMatcher.isEmpty())
+				wildcardMatcher = "*";
+
+			if (FilenameUtils.wildcardMatch(filename, wildcardMatcher )) {
 				OutputStream output;
 				output = new FileOutputStream(OutputFolder + "/" + filename);
 				ftpClient.retrieveFile(filename, output);
-				// close output stream
 				output.close();				
 				File resultfile = new File(OutputFolder, filename);
 				files.add(resultfile);
 				ftpClient.deleteFile(filename);
 			}
-
 		}
 		
 		ftpClient.logout();

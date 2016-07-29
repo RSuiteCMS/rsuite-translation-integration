@@ -11,6 +11,21 @@ To use:
 
 2) Adjust your build process to copy the jar into your plugin build.
 
+3) Call the appropriate methods to FTP/SFTP. For example:
+
+
+Send by FTP
+	InputStream translationSourceStream =  sourceMo.getInputStream(); 
+	String filename = "myfile.xml";
+	String ftpFolderPath = "export";
+	ISftpConnectionInfo connectionInfo = FTPConnectionInfoFactory.createConnectionInfoObject(context);
+	try {
+		FtpUtils.uploadInputStream(connectionInfo, translationSourceStream, filename, ftpFolderPath);
+		log.info("Success submitting " + filename + " to XTM Cloud via FTP.");
+	} catch (SftpUtilsException e) {
+		log.error("Error sending: " + filename + "to: " + connectionInfo.getHost() + ":" + connectionInfo.getPort());
+		throw new RSuiteException(e.getMessage());
+	}
 
 
 Add RSuite properties for FTP or SFTP connection. 
@@ -18,7 +33,7 @@ Add RSuite properties for FTP or SFTP connection.
 	rsuite.ftp.user - eg myusername
 	rsuite.ftp.password - eg mypassword
 	rsuite.ftp.port - eg 21 
-    rsuite.ftp.sftp - true or false; defaults to false, meaning ftp will be used
+    rsuite.ftp.sftp - true or false; defaults to false
 
 	(We should make it possible to set these via API instead...)
 

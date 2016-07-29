@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,22 +33,21 @@ public class SftpUtils {
 	 * 
 	 * @param context
 	 * @param connectionInfo
-	 * @param sftpFolderPath
-	 *            Remote path to upload file within.
 	 * @param file
 	 *            Local file to transfer the bytes of.
 	 * @param filename
 	 *            Remote file name to use.
+	 * @param sftpFolderPath
+	 *            Remote path to upload file within.
 	 */
 	public static void uploadFile(ExecutionContext context,
-			ISftpConnectionInfo connectionInfo, String sftpFolderPath,
-			File file, String filename) throws SftpUtilsException {
+			ISftpConnectionInfo connectionInfo, File file, String filename, 
+			String sftpFolderPath) throws SftpUtilsException {
 		log.info("Transferring \"" + file.getAbsolutePath() + "\" as \""
 				+ sftpFolderPath + "/" + filename + "\"...");
 		try {
 			FileInputStream inStream = new FileInputStream(file);
-			uploadInputStream(context, connectionInfo, sftpFolderPath,
-					inStream, filename);
+			uploadInputStream(context, connectionInfo, inStream, filename, sftpFolderPath);
 		} catch (FileNotFoundException e) {
 			handleExceptions("uploading file", sftpFolderPath, "", e);
 		}
@@ -58,16 +58,16 @@ public class SftpUtils {
 	 * 
 	 * @param context
 	 * @param connectionInfo
-	 * @param sftpFolderPath
-	 *            Remote path to upload file within.
 	 * @param file
 	 *            Local file to transfer the bytes of.
 	 * @param filename
 	 *            Remote file name to use.
+	 * @param sftpFolderPath
+	 *            Remote path to upload file within.
 	 */
 	public static void uploadInputStream(ExecutionContext context,
-			ISftpConnectionInfo connectionInfo, String sftpFolderPath,
-			InputStream inputStream, String filename) throws SftpUtilsException {
+			ISftpConnectionInfo connectionInfo, InputStream inputStream, 
+			String filename, String sftpFolderPath) throws SftpUtilsException {
 
 		Session session = null;
 		ChannelSftp c = null;
@@ -239,7 +239,7 @@ public class SftpUtils {
 	 * @param context
 	 * @param connectionInfo
 	 * @param sftpFolderPath
-	 * @param prefix
+	 * @param wildcardMatcher
 	 * @param OutputFolder
 	 * @param files
 	 * @throws SftpUtilsException
@@ -247,7 +247,7 @@ public class SftpUtils {
 	 */
 	public static void downloadAndRemoveFiles(ExecutionContext context,
 			ISftpConnectionInfo connectionInfo, String sftpFolderPath,
-			String prefix, String OutputFolder, List<File> files)
+			String wildcardMatcher, String OutputFolder, List<File> files)
 			throws SftpUtilsException, IOException {
 
 		log.info("Retrieving files in: " + sftpFolderPath);
@@ -271,7 +271,10 @@ public class SftpUtils {
 
 				ChannelSftp.LsEntry file = (ChannelSftp.LsEntry) entry;
 				filename = file.getFilename();
-				if (filename.startsWith(prefix)) {
+				if (wildcardMatcher == null || wildcardMatcher.isEmpty())
+					wildcardMatcher = "*";
+
+				if (FilenameUtils.wildcardMatch(filename, wildcardMatcher)) {
 					OutputStream output;
 					output = new FileOutputStream(OutputFolder + "/" + filename);
 					log.info("Dowloading file: " + filename + " to: "
@@ -292,13 +295,13 @@ public class SftpUtils {
 
 		} catch (JSchException e) {
 			handleExceptions("creating channel (JSchException)",
-					sftpFolderPath, prefix, e);
+					sftpFolderPath, wildcardMatcher, e);
 		} catch (SftpException e) {
 			handleExceptions("creating channel (SftpException)",
-					sftpFolderPath, prefix, e);
+					sftpFolderPath, wildcardMatcher, e);
 		} catch (IllegalStateException e) {
 			handleExceptions("creating channel (IllegalStateException)",
-					sftpFolderPath, prefix, e);
+					sftpFolderPath, wildcardMatcher, e);
 		}
 	}
 
