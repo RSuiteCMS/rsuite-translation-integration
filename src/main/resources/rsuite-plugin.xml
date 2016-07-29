@@ -1,0 +1,6 @@
+<rsuite-plugin id="@pluginId@" version="@pluginVersion@ at @timeStamp@" description="Developer methods for file transfer protocols">
+	<extensionProvider id="rsuite.WebService">
+		<staticWebService path="/WebContent" root="/@pluginId@"/>
+	</extensionProvider>
+
+</rsuite-plugin>
