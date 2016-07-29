@@ -6,3 +6,6 @@ bin
 *.bak
 *.log
 .svn
+.settings
+.project
+.classpath
