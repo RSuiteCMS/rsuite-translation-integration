@@ -18,14 +18,15 @@ dependencies {
     }
     compile("apache:commons-logging:1.1")
     compile("apache:commons-io:1.4")
-    compile("apache:commons-net:3.3")
 
 	includeInJar "jcraft:jsch:0.1.45"
+	includeInJar "rsi:rsuite-file-transfer-tools:1"
+	includeInJar "rsi:team-edition-plugin-utilities:2.0-qa020"
   	configurations.compile.extendsFrom(configurations.includeInJar)
 }
 
 jar () {
-	baseName='rsuite-file-transfer-tools'
+	baseName='rsuite-translation-integration'
 	from configurations.includeInJar
 }
 

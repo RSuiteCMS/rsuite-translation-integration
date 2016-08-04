@@ -1,0 +1,111 @@
+<rsuite-plugin id="@pluginId@" version="@pluginVersion@ at @timeStamp@" description="Services to support passing files to and from translation systems">
+
+    <lifecycleListener type="com.rsicms.rsuite.translation.lifecycle.ConfigurationLifecycle"/>
+
+    <extensionProvider id="rsuite.Scheduler">
+        <scheduledJobHandler handler="com.rsicms.rsuite.translation.job.RetrieveXtmTranslationsScheduledJob" id="xtmTranslations"/>
+    </extensionProvider>
+    
+    <extensionProvider id="rsuite.WebService">
+		<staticWebService path="/WebContent" root="/@pluginId@"/>
+
+        <remoteApiDefinition handler="com.rsicms.rsuite.translation.webservice.AddTranslationsToBriefcase" id="translation.ws.AddTranslationsToBriefcase"/>
+        <remoteApiDefinition handler="com.rsicms.rsuite.translation.webservice.RequestTranslations" id="translation.ws.RequestTranslations"/>
+    </extensionProvider>
+
+	<extensionProvider id="rsuite.UI">
+	    <styleInclude src="/@pluginId@/ui/styles.less"/>
+	    <contentDisplayAdvisor id="translation:ContentDisplayAdvisor" type="com.rsicms.rsuite.translation.advisor.TranslationContentAdvisor"/>
+	</extensionProvider>
+
+    <extensionProvider id="rsuite.ContextMenu">
+        <contextMenuRuleSet name="menu.translation:lmd">
+            <menuItemList>
+                <menuItem id="menu.translationLmd">
+                    <actionName>rsuite:editMetaData</actionName>
+                    <label>Set translation metadata</label>
+                    <property name="formId" value="form.translation.lmd"/>
+                    <property name="rsuite:path" value="Metadata"/>
+                    <property name="rsuite:group" value="metadata"/>
+                </menuItem>
+            </menuItemList>
+            <ruleList>
+                <rule>include nodeType ca,mo,mononxml</rule>
+            </ruleList>
+        </contextMenuRuleSet>
+    </extensionProvider>
+    
+    <extensionProvider id="rsuite.Forms">
+        <formDefinition id="form.translation.translationRequest" label="Request Translations" handler="com.rsicms.rsuite.translation.formhandler.TranslationRequestForm">
+            <property name="dialogOptions.width" value="600px"/>
+        </formDefinition>
+
+        <formDefinition id="form.translation.lmd" label="Assign Translation Metadata">
+            <column name="col1">
+                <param>
+                    <name>language</name>
+                    <label>Language</label>
+                    <formControlType>select</formControlType>
+                    <datatype name="languageDt"/>
+                    <allowMultiple>false</allowMultiple>
+                </param>
+                <param>
+                    <name>translationOf</name>
+                    <label>Translation of ID</label>
+                    <formControlType>input</formControlType>
+                </param>
+                <param>
+                    <name>translationOfRevision</name>
+                    <label>Translation of Revision</label>
+                    <formControlType>input</formControlType>
+                </param>
+            </column>
+            <column name="col2">
+                <param>
+                    <name>isBaseLanguage</name>
+                    <label>Base Language</label>
+                    <formControlType>radio</formControlType>
+                    <datatype name="booleanDt"/>
+                </param>
+                <param>
+                    <name>translationState</name>
+                    <label>Translation State</label>
+                    <formControlType>select</formControlType>
+                    <datatype name="translationStateDt"/>
+                </param>
+                <param>
+                    <name>translationRequestDate</name>
+                    <label>Translation Request Date</label>
+                    <formControlType>datepicker</formControlType>
+                </param>
+                <param>
+                    <name>translationUpdateDate</name>
+                    <label>Translation Update Date</label>
+                    <formControlType>datepicker</formControlType>
+                </param>
+            </column>
+        </formDefinition>
+        
+        <datatypeDefinition name="translationStateDt">
+            <optionListProvider handler="com.rsicms.rsuite.translation.datatype.TranslationStatusDataTypeProvider"/>
+        </datatypeDefinition>
+
+        <datatypeDefinition name="booleanDt">
+            <optionList>
+                <option label="True" value="true"/>
+                <option label="False" value="false"/>
+            </optionList>
+        </datatypeDefinition>
+    </extensionProvider>
+
+    <extensionProvider id="rsuite.Workflow">
+        <workflowDefinitions>
+            <file key="Translation Notification Workflow" filename="WebContent/workflow/TranslationNotificationWorkflow.bpmn"/>
+        </workflowDefinitions>
+    </extensionProvider>
+
+    <extensionProvider id="rsuite.EventBus">
+        <eventHandler type="com.rsicms.rsuite.translation.events.TranslationEventListener" includeRegex="object.mo.checkedin"/>
+    </extensionProvider>
+    
+</rsuite-plugin>

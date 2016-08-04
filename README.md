@@ -1,78 +1,73 @@
-rsuite-file-transfer-tools
+rsuite-translation-integration
 -----
 
-This plugin provides methods to send and retrieve files using FTP and SFTP, leveraging JCraft JSch (Java secure channel library, http://www.jcraft.com/jsch/). 
+THIS IS AN IN-PROGRESS VERSION OF A PLUGIN DEVELOPED FOR DEMONSTRATIONS
 
-This plugin doesn't directly provide RSuite user features. It provides classes for developers to reference from other RSuite plugins.
+This plugin provides methods to send/retrieve files to/from other systems for language translation. 
+
+To use this plugin, you must add menu actions to your own plugin that reference services in this plugin.
 
 To use:
 
 1) Add this jar as a dependency for your plugin project.
 
-2) Add jcraft:jsch:0.1.45 as a dependency.
+2) Adjust your build process to deploy the plugin to your RSuite installation.
 
-3) Adjust your build process to copy both jars into your plugin build.
+3) In your own plugin, configure the language datatype values you want to use e.g.,:
+	<datatypeDefinition name="languageDt">
+		<optionList>
+			<option label="English - US" value="en-US"/>
+			<option label="Chinese Simplified" value="zh-CN"/>
+			<option label="Chinese Traditional" value="zh"/>
+			<option label="Danish" value="da"/>
+			...
+		</optionList>
+	</datatypeDefinition>
 
-4) Call the appropriate methods to FTP/SFTP in your code. For example:
+4) Add the actions you want, similar to these: 
+
+	<contextMenuRuleSet name="menu.rsuite:translationsToBriefcase">
+		<menuItemList>
+			<menuItem id="menu.rsuite.translationsToBriefcase">
+				<actionName>rsuite:invokeWebservice</actionName>
+				<label>Put translations on Briefcase</label>
+				<property name="remoteApiName" value="translation.ws.AddTranslationsToBriefcase"/>
+				<property name="rsuite:group" value="translation"/>
+				<property name="rsuite:path" value="Translation"/>
+			</menuItem>
+		</menuItemList>
+		<ruleList>
+			<rule>include nodeType mo</rule>
+		</ruleList>
+	</contextMenuRuleSet>
+	<contextMenuRuleSet name="menu.rsuite:translationsRequest">
+		<menuItemList>
+			<menuItem id="menu.rsuite.translationsRequest">
+				<actionName>rsuite:invokeWebservice</actionName>
+				<label>Request translations (XTM)</label>
+				<property name="remoteApiName" value="translation.ws.RequestTranslations"/>
+				<property name="formId" value="form.translation.translationRequest"/>
+				<property name="rsuite:group" value="translation"/>
+				<property name="rsuite:path" value="Translation"/>
+				<property name="serviceParams.client" value="IIC"/>
+			</menuItem>
+		</menuItemList>
+		<ruleList>
+			<rule>include nodeType mo</rule>
+		</ruleList>
+	</contextMenuRuleSet>
+
+5) Add translation columns to content results, if you want them:
+
+	<searchResultsConfiguration>
+		<columnList>
+			...
+			<column name="language" label="Lang"/>
+			<column name="translationOf" label="Translation Of"/>
+			<column name="translationStatus" label="Status"/>
+			...
+		</columnList>
+	</searchResultsConfiguration>
+
+6) In the Admin Console, delete the scheduled jobs you don't want to use.
 	
-	private void ftpSend(ExecutionContext context, ManagedObject sourceMo) throws RSuiteException {
-		InputStream translationSourceStream =  sourceMo.getInputStream(); 
-		String filename = "myfile.xml";
-		String ftpFolderPath = "export";
-		ISftpConnectionInfo connectionInfo = FTPConnectionInfoFactory.createConnectionInfoObject(context);
-		try {
-			FtpUtils.uploadInputStream(connectionInfo, translationSourceStream, filename, ftpFolderPath);
-			log.info("Success submitting " + filename + " via FTP.");
-		} catch (SftpUtilsException e) {
-			log.error("Error sending: " + filename + "to: " + connectionInfo.getHost() + ":" + connectionInfo.getPort());
-			throw new RSuiteException(e.getMessage());
-		}
-	}
-
-	private void sftpSend(ExecutionContext context, ManagedObject sourceMo) throws RSuiteException {
-		InputStream translationSourceStream =  sourceMo.getInputStream(); 
-		String filename = "myfile.xml";
-		String sftpFolderPath = "export";
-		ISftpConnectionInfo connectionInfo = FTPConnectionInfoFactory.createConnectionInfoObject(context);
-		try {
-			SftpUtils.uploadInputStream(context, connectionInfo, translationSourceStream, filename, sftpFolderPath);
-			log.info("Success submitting " + filename + " via FTP.");
-		} catch (SftpUtilsException e) {
-			log.error("Error sending: " + filename + "to: " + connectionInfo.getHost() + ":" + connectionInfo.getPort());
-			throw new RSuiteException(e.getMessage());
-		}
-	}
-
-	private List<File> ftpDownload(ExecutionContext context) throws RSuiteException {
-		String wildcardMatcher = "*.*";
-		String ftpFolderPath = "import";
-		String outputfolder = context.getConfigurationProperties().getProperty(
-				Constants.RSUITE_TEMP_DIR, "");
-		ISftpConnectionInfo connectionInfo = FTPConnectionInfoFactory.createConnectionInfoObject(context);
-		List<File> files = new ArrayList<File>();
-		try {
-			FtpUtils.downloadAndRemoveFiles(connectionInfo, ftpFolderPath,
-					wildcardMatcher, outputfolder, files);
-		} catch (IOException e) {
-			log.error("Error retrieving file from the server. " + e.getMessage());
-			throw new RSuiteException(e.getMessage());
-		}
-		return files;
-	}
-
-	private List<File> sftpDownload(ExecutionContext context) throws RSuiteException {
-		String wildcardMatcher = "*.*";
-		String ftpFolderPath = "import";
-		String outputfolder = context.getConfigurationProperties().getProperty(
-				Constants.RSUITE_TEMP_DIR, "");
-		ISftpConnectionInfo connectionInfo = FTPConnectionInfoFactory.createConnectionInfoObject(context);
-		List<File> files = new ArrayList<File>();
-		try {
-			SftpUtils.downloadAndRemoveFiles(context, connectionInfo, ftpFolderPath,
-					wildcardMatcher, outputfolder, files);
-		} catch (IOException | SftpUtilsException e) {
-			log.error("Error retrieving file from the server. " + e.getMessage());
-			throw new RSuiteException(e.getMessage());
-		}
-		return files;
-	}

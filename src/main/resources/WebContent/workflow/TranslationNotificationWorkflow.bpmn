@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+    targetNamespace="http://activiti.org/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+    <process id="TranslationNotificationWorkflow" name="Translation Notification Workflow" isExecutable="true">
+        <startEvent id="theStart"/>
+        <sequenceFlow sourceRef="theStart" targetRef="assignNotification"/>
+        <userTask id="assignNotification" name="Translation Notification" activiti:candidateGroups="TranslationManager">
+            <documentation>${notification}</documentation>
+        </userTask>
+        <sequenceFlow sourceRef="assignNotification" targetRef="theEnd"/>
+        <endEvent id="theEnd" name="End Workflow"/>
+    </process>
+</definitions>
