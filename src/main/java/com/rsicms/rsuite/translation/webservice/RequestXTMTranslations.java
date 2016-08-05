@@ -30,9 +30,9 @@ import com.rsicms.rsuite.helpers.utils.RSuiteUtils;
 import com.rsicms.rsuite.translation.TranslationConstants;
 import com.rsicms.rsuite.translation.utils.XTMUtils;
 
-public class RequestTranslations extends DefaultRemoteApiHandler {
+public class RequestXTMTranslations extends DefaultRemoteApiHandler {
 
-	private static Log log = LogFactory.getLog(RequestTranslations.class);
+	private static Log log = LogFactory.getLog(RequestXTMTranslations.class);
 
 	@Override
 	public RemoteApiResult execute(RemoteApiExecutionContext context, CallArgumentList args) throws RSuiteException  {

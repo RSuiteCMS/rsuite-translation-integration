@@ -10,7 +10,8 @@
 		<staticWebService path="/WebContent" root="/@pluginId@"/>
 
         <remoteApiDefinition handler="com.rsicms.rsuite.translation.webservice.AddTranslationsToBriefcase" id="translation.ws.AddTranslationsToBriefcase"/>
-        <remoteApiDefinition handler="com.rsicms.rsuite.translation.webservice.RequestTranslations" id="translation.ws.RequestTranslations"/>
+        <remoteApiDefinition handler="com.rsicms.rsuite.translation.webservice.RequestXTMTranslations" id="translation.ws.RequestXTMTranslations"/>
+        <remoteApiDefinition handler="com.rsicms.rsuite.translation.webservice.CopyForTranslation" id="translation.ws.CopyForTranslations"/>
     </extensionProvider>
 
 	<extensionProvider id="rsuite.UI">
@@ -37,6 +38,10 @@
     
     <extensionProvider id="rsuite.Forms">
         <formDefinition id="form.translation.translationRequest" label="Request Translations" handler="com.rsicms.rsuite.translation.formhandler.TranslationRequestForm">
+            <property name="dialogOptions.width" value="600px"/>
+        </formDefinition>
+
+        <formDefinition id="form.translation.translationCopy" label="Add Translations" handler="com.rsicms.rsuite.translation.formhandler.TranslationAddForm">
             <property name="dialogOptions.width" value="600px"/>
         </formDefinition>
 

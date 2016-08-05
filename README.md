@@ -45,11 +45,11 @@ To use:
 			<menuItem id="menu.rsuite.translationsRequest">
 				<actionName>rsuite:invokeWebservice</actionName>
 				<label>Request translations (XTM)</label>
-				<property name="remoteApiName" value="translation.ws.RequestTranslations"/>
+				<property name="remoteApiName" value="translation.ws.RequestXTMTranslations"/>
 				<property name="formId" value="form.translation.translationRequest"/>
 				<property name="rsuite:group" value="translation"/>
 				<property name="rsuite:path" value="Translation"/>
-				<property name="serviceParams.client" value="IIC"/>
+				<property name="serviceParams.client" value="companyname"/>
 			</menuItem>
 		</menuItemList>
 		<ruleList>
