@@ -12,6 +12,7 @@
         <remoteApiDefinition handler="com.rsicms.rsuite.translation.webservice.AddTranslationsToBriefcase" id="translation.ws.AddTranslationsToBriefcase"/>
         <remoteApiDefinition handler="com.rsicms.rsuite.translation.webservice.RequestXTMTranslations" id="translation.ws.RequestXTMTranslations"/>
         <remoteApiDefinition handler="com.rsicms.rsuite.translation.webservice.CopyForTranslation" id="translation.ws.CopyForTranslations"/>
+        <remoteApiDefinition handler="com.rsicms.rsuite.translation.webservice.DownloadForTradosTranslation" id="translation.ws.DownloadForTradosTranslation"/>
     </extensionProvider>
 
 	<extensionProvider id="rsuite.UI">
@@ -42,6 +43,10 @@
         </formDefinition>
 
         <formDefinition id="form.translation.translationCopy" label="Add Translations" handler="com.rsicms.rsuite.translation.formhandler.TranslationAddForm">
+            <property name="dialogOptions.width" value="600px"/>
+        </formDefinition>
+
+        <formDefinition id="form.translation.translationTrados" label="Download for Trados Translation" handler="com.rsicms.rsuite.translation.formhandler.TranslationDownloadForTradosForm">
             <property name="dialogOptions.width" value="600px"/>
         </formDefinition>
 

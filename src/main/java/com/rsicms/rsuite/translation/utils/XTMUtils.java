@@ -70,11 +70,11 @@ public class XTMUtils {
 				+ ">>" + targetLanguage);
 
 		ISftpConnectionInfo connectionInfo = FTPConnectionInfoFactory.createConnectionInfoObject(context);
-		InputStream translationSourceStream = removeIdsFromSource(context, sourceMo); 
 		try {
+			InputStream translationSourceStream = removeIdsFromSource(context, sourceMo); 
 			FtpUtils.uploadInputStream(connectionInfo, translationSourceStream, filename, sftpFolderPath);
 			log.info("Success submitting " + filename + " to XTM Cloud via FTP.");
-		} catch (SftpUtilsException e) {
+		} catch (Exception e) {
 			log.error("Error sending: " + filename + "to: " + connectionInfo.getHost() + ":" + connectionInfo.getPort());
 			throw new RSuiteException(e.getMessage());
 		}
@@ -133,8 +133,12 @@ public class XTMUtils {
 		return xtmFiles;
 	}
 
-	private static InputStream removeIdsFromSource(ExecutionContext context, ManagedObject sourceMo)
-			throws RSuiteException {
+	public static InputStream removeIdsFromSource(ExecutionContext context, ManagedObject sourceMo)
+			throws RSuiteException, IOException {
+		return removeIdsFromSource(context, sourceMo, false);
+	}
+	public static InputStream removeIdsFromSource(ExecutionContext context, ManagedObject sourceMo, Boolean includeDocType)
+			throws RSuiteException, IOException {
 		String docString = "";
 		try {
 			//cannot include doctype when submit to XTM
@@ -145,9 +149,20 @@ public class XTMUtils {
 			log.error("Couldn't get string for mo document. Can't request translation. " + e);
 			return null;
 		}
+		if (includeDocType) {
+			docString = prependDoctypeDeclaration(sourceMo, docString);
+		}
 		docString = docString.replaceAll("r:rsuiteId=\\\"\\d+\\\"", "").trim();
 		InputStream stream = new ByteArrayInputStream(docString.getBytes(StandardCharsets.UTF_8));
 		return stream;
 	}
 	
+	//TODO this is reusable code 
+	private static String prependDoctypeDeclaration(ManagedObject mo, String docString) throws RSuiteException, IOException {
+		String doctype = "<!DOCTYPE " + mo.getElement().getNodeName() + " PUBLIC \"" + mo.getPublicIdProperty() + "\" \"" + mo.getSystemIdProperty() + "\">";
+		String docWithDocType = docString.replaceAll("\\<\\?xml(.)*?>", "");
+		docWithDocType = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + doctype + docWithDocType;
+		return docWithDocType;
+	}
+
 }
