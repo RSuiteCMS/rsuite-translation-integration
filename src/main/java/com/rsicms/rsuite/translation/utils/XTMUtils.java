@@ -101,7 +101,7 @@ public class XTMUtils {
 	public static List<XTMFile> retrieveFilesFromXtmCloud(
 			ExecutionContext context, User user, String client)
 			throws RSuiteException {
-		log.info("Requesting XTM translation files");
+		log.info("Requesting XTM translation files.");
 		List<XTMFile> xtmFiles = new ArrayList<XTMFile>();
 		List<File> files = new ArrayList<File>();
 
@@ -116,11 +116,14 @@ public class XTMUtils {
 		String sftpFolderPath = context.getConfigurationProperties()
 				.getProperty(TranslationConstants.FTP_IMPORT_PATH, "import");
 
+		log.info("Will attempt download using:\n  host=" + connectionInfo.getHost() + "\n  user=" + 
+				connectionInfo.getUserName() + "\n  sftp folder=" + sftpFolderPath + "\n  instance id=" + rsuiteInstanceId
+				+ "\n  outputfolder=" + outputfolder);
 		try {
 			FtpUtils.downloadAndRemoveFiles(connectionInfo, sftpFolderPath,
 					rsuiteInstanceId + "*.*", outputfolder, files);
 		} catch (IOException e) {
-			log.error("Error retrieving file from the server. " + e.getMessage());
+			log.error("Error retrieving file from the server. " + e.getMessage() + " " + e);
 			throw new RSuiteException(e.getMessage());
 		}
 
@@ -130,6 +133,7 @@ public class XTMUtils {
 			xtmFiles.add(xtmFile);
 			log.info("Adding file: " + file.getName() + " to the XTMFile list");
 		}
+		log.info("Request returned " + xtmFiles.size() + " files(s).");
 		return xtmFiles;
 	}
 
