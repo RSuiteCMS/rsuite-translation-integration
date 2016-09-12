@@ -120,7 +120,7 @@ public class XTMUtils {
 				connectionInfo.getUserName() + "\n  sftp folder=" + sftpFolderPath + "\n  instance id=" + rsuiteInstanceId
 				+ "\n  outputfolder=" + outputfolder);
 		try {
-			FtpUtils.downloadAndRemoveFiles(connectionInfo, sftpFolderPath,
+			FtpUtils.downloadAndRemoveFiles(context, connectionInfo, sftpFolderPath,
 					rsuiteInstanceId + "*.*", outputfolder, files);
 		} catch (IOException e) {
 			log.error("Error retrieving file from the server. " + e.getMessage() + " " + e);
